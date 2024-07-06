@@ -44,6 +44,11 @@
   font-size: 17px;
   cursor: pointer;
 }
+
+.generator__btn:disabled{
+  background: #699774;
+}
+
 .form-group {
   display: flex;
   justify-content: space-between;

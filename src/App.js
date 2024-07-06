@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "./App.css"
 import { numbers, upperCaseLetters, lowerCaseLetters, specialCharacters } from './Character'
 import { toast, ToastContainer } from 'react-toastify'
@@ -12,7 +12,9 @@ const App = () => {
   const [includeLowerCase, setIncludeLowerCase] = useState(false)
   const [includeNumbers, setIncludeNumbers] = useState(false)
   const [includeSymbols, setIncludeSymbols] = useState(false)
+  const [disable, setDisable] = useState(false)
   const handleGeneratePassword = () => {
+    setDisable(true)
     if (!includeUpperCase && !includeLowerCase && !includeNumbers && !includeSymbols) {
       notify("To generate password you must select atleast one checkbox", true)
     }
@@ -32,6 +34,9 @@ const App = () => {
       }
       setPassword(createPassword(characterList))
       notify("Password is generated successfully", false)
+      setTimeout(() => {
+        setDisable(false)
+      }, 200)
     }
 
 
@@ -52,7 +57,7 @@ const App = () => {
   const notify = (message, hasError = false) => {
     if (hasError) {
       toast.error(message, {
-        position: "top-center",
+        position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -63,7 +68,7 @@ const App = () => {
     }
     else {
       toast(message, {
-        position: "top-center",
+        position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -85,12 +90,20 @@ const App = () => {
 
   }
 
+  useEffect(() => {
+    if (!includeUpperCase && !includeLowerCase && !includeNumbers && !includeSymbols) {
+      setDisable(true)
+    } else {
+      setDisable(false)
+    }
+  }, [includeLowerCase, includeNumbers, includeSymbols, includeUpperCase])
+
   return (
     <div className="App">
       <div className="container">
         <div className="generator">
           <h2 className="generator__header">
-           Password Generator
+            Password Generator
           </h2>
           <div className="generator__password">
             <h3 >{password}</h3>
@@ -100,7 +113,7 @@ const App = () => {
           </div>
           <div className="form-group">
             <label htmlFor="password-strength">Password length</label>
-            <input className="pw" defaultValue={passwordLength} onChange={(e) => setPasswordLength(e.target.value)} type="number" id="password-stregth" name="password-strength" max="26" min="8" />
+            <input className="pw" defaultValue={passwordLength} onChange={(e) => setPasswordLength(e.target.value)} type="number" id="password-stregth" name="password-strength" max={26} min={4} />
           </div>
           <div className="form-group">
             <label htmlFor="uppercase-letters">Add Uppercase Letters</label>
@@ -118,12 +131,12 @@ const App = () => {
             <label htmlFor="include-symbols">Include Symbols</label>
             <input checked={includeSymbols} onChange={(e) => setIncludeSymbols(e.target.checked)} type="checkbox" id="include-symbols" name="include-symbols" />
           </div>
-          <button onClick={handleGeneratePassword} className="generator__btn">
-            Generate Password
+          <button disabled={disable} onClick={handleGeneratePassword} className="generator__btn">
+            {false ? "Generating... " : "Generate Password"}
           </button>
           <ToastContainer
             position="top-center"
-            autoClose={5000}
+            autoClose={2000}
             hideProgressBar={false}
             newestOnTop={false}
             closeOnClick
